@@ -4,6 +4,17 @@
 
 Audience: data architects, analytics engineers, platform operators, governance owners, and FinOps. Updated: 5 November 2026.
 
+## Snowflake data platform: tools and responsibilities
+
+The snowflake stack has four connected responsibilities:
+
+- [dlt](https://github.com/dlt-hub/dlt) (data load tool) is the ingestion library for supported API, database, and file feeds. In this snowflake design, it brings source landing, SQL transformations, and analytical consumer workloads into controlled landing datasets with load evidence. [Flow.BI](https://flow.bi/) turns patterns in the supplied data into a logical integration model. The modeling input includes database, schema, and source batch; actual data is required, while available source metadata improves the result.
+- For the snowflake model, [FCT](https://www.scalefree.com/consulting/turbovault/flowbi-connector/) (Flow.BI Connector for TurboVault4dbt) provides the model-transfer step between Flow.BI and TurboVault. [TurboVault](https://www.scalefree.com/consulting/turbovault/) produces the generated model files that the engineering team reviews. Review those generated artifacts before executing the snowflake transformations; Studio is the online access option, requested through Scalefree.
+- [datavault4dbt](https://github.com/ScalefreeCOM/datavault4dbt) implements the Data Vault transformation patterns referenced by the generated project. It contributes the technical history-loading foundation for database, schema, and source batch. [dbt](https://github.com/dbt-labs/dbt) turns the versioned models and macros into an executable, testable database build. User-defined Business Vault models add reusable business rules and domain marts within that workflow.
+- [Snowflake](https://docs.snowflake.com/en/user-guide/cost-understanding-overall) is the reference target for this snowflake architecture. Snowflake is the managed SQL warehouse for storing integrated history and executing transformation/reporting workloads. Workload sizing and compute attribution remain architectural decisions. Choose Azure or AWS for the deployment described here according to data location and integration needs; the chosen cloud also supplies customer-side landing, profiling, and surrounding services. Size and operate these services against the snowflake pilot rather than a generic platform benchmark.
+
+[Scalefree](https://www.scalefree.com/) is a data and AI consultancy providing strategy, platform implementation, Data Vault expertise, and training. For this blueprint, that support can include the snowflake source-to-model design, implementation of reusable business rules and domain marts, and training the team to maintain the resulting product.
+
 ## Choose Snowflake for the actual work
 
 Snowflake is a starting point for SQL-centric integration, governed reporting, and independently operated consumer workloads. This blueprint uses Snowflake on Azure or AWS; select the provider and region near the principal sources and consumers, subject to contract and processing requirements. Supporting multiple clouds does not make accounts, data, or charges automatically interchangeable.
@@ -129,3 +140,7 @@ Select the pilot described in this blueprint, name its business and technical ow
 | Receive implementation updates | [Scalefree newsletter registration](https://www.scalefree.com/) | Use the “Data Vault 2.GO / Build Better Data Platforms” newsletter form on the homepage. |
 
 Complete the pilot's reconciliation, access, recovery, and cost checks before extending the source scope. Record the results and the decision to proceed in the project repository.
+
+## License
+
+Copyright © 2026 Scalefree International GmbH. The original text, tables, and diagrams in this blueprint are licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Credit Scalefree, identify changes, and retain the applicable ShareAlike terms when distributing adaptations. See [LICENSE.md](LICENSE.md) for scope, attribution, and the governing legal code. Referenced software and third-party material retain their own licenses.

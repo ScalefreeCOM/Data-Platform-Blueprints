@@ -4,6 +4,17 @@
 
 Audience: nonprofit leadership, program managers, fundraising, finance, safeguarding, monitoring/evaluation, and data teams. Updated: 5 November 2026.
 
+## Data Vault automation and platform choices for Nonprofit
+
+The nonprofit stack has four connected responsibilities:
+
+- [dlt](https://github.com/dlt-hub/dlt) (data load tool) is the ingestion library for supported API, database, and file feeds. In this nonprofit design, it brings grant, accounting, and program delivery into controlled landing datasets with load evidence. [Flow.BI](https://flow.bi/) builds a logical Data Vault from profiled source datasets and their relationships. The modeling input includes grant, restriction, and expenditure; actual data is required, while available source metadata improves the result.
+- For the nonprofit model, [FCT](https://www.scalefree.com/consulting/turbovault/flowbi-connector/) (Flow.BI Connector for TurboVault4dbt) retrieves and translates the generated model into metadata for the generator. [TurboVault](https://www.scalefree.com/consulting/turbovault/) creates physical-model definitions as dbt project artifacts. Review those generated artifacts before executing the nonprofit transformations; Studio is the online access option, requested through Scalefree.
+- [datavault4dbt](https://github.com/ScalefreeCOM/datavault4dbt) provides the transformation templates for staging and historized Vault entities. It contributes the technical history-loading foundation for grant, restriction, and expenditure. [dbt](https://github.com/dbt-labs/dbt) orchestrates the SQL model dependency graph through compilation, execution, and tests. User-defined Business Vault models add restricted-fund allocation and indicator cohorts within that workflow.
+- [Google BigQuery](https://cloud.google.com/bigquery/pricing) is the reference target for this nonprofit architecture. BigQuery is the managed analytical warehouse and SQL execution engine for the typed source data, Vault, and reporting products. Google Cloud provides the project/IAM, storage, network, and execution environment around BigQuery. The customer-managed Flow.BI Docker component runs within that environment. Size and operate these services against the nonprofit pilot rather than a generic platform benchmark.
+
+[Scalefree](https://www.scalefree.com/) helps organizations plan, implement, automate, and operate data and analytics solutions. For this blueprint, that support can include the nonprofit source-to-model design, implementation of restricted-fund allocation and indicator cohorts, and training the team to maintain the resulting product.
+
 ## Platform recommendation and decision assumptions
 
 **Recommended starting point: Google Cloud with BigQuery.** This recommendation assumes a small SQL-capable organization with intermittent grant/program reporting and no existing analytics-capacity commitment. It is an architectural judgment to validate, not a claim that an industry has one universally best platform.
@@ -74,20 +85,6 @@ Finance owns eligible expenditure and fund balances; program management owns act
 Acceptance requires reconciling expenses to accounting, verifying restriction allocations, reproducing an indicator at a historical cutoff, and checking that a participant receiving multiple services is counted correctly. Test funder-report suppression and removal of a volunteer's access. Unallocated costs and missing participant observations remain explicit exceptions.
 
 Expand to multi-country grants, partner delivery, and fundraising effectiveness when the pilot is reconciled. The complete technology, cloud, training, and resource guidance follows.
-
-## Implement the analytical pipeline
-
-The common automation chain is **Flow.BI → FCT → TurboVault → review generated dbt models → datavault4dbt/dbt execution**. Users then add **Business Vault entities** for the industry rules described above. Keep generated Raw Vault artifacts and user-authored extensions in separate project paths.
-
-Flow.BI requires actual source data. Source metadata is mostly optional and improves results. Its [local-processing Docker image](https://flow.bi/blog/how-flow-bi-protects-sensitive-enterprise-data/) runs in the customer's Azure, AWS, or Google Cloud environment and sends derived metadata/statistical fingerprints to the Flow.BI backend. Approve source access and the outbound payload as part of the processing design.
-
-Use [dlt](https://github.com/dlt-hub/dlt) for supported API, database, and file ingestion. Select source-specific cursor/CDC or snapshot behavior, persistent pipeline state, restart rules, deletion detection, and schema-change handling. Specialized clinical, industrial, carrier, or streaming acquisition requires an authorized, compatible interface or gateway. A timestamp cursor alone does not guarantee capture of every intermediate event or delete.
-
-[FCT](https://www.scalefree.com/consulting/turbovault/flowbi-connector/) connects the Flow.BI model to the generator workflow. [TurboVault4dbt](https://github.com/ScalefreeCOM/turbovault4dbt) and [TurboVault Engine](https://github.com/ScalefreeCOM/turbovault-engine) are distinct generator editions; select the supported integration route. Request the online TurboVault Studio through Scalefree as described under Next steps. Keep the selected generator's metadata contract in the release record.
-
-[datavault4dbt](https://github.com/ScalefreeCOM/datavault4dbt) supplies staging and Vault macros; [dbt](https://github.com/dbt-labs/dbt) compiles/tests/runs models against the target adapter. Pin runtime, adapter, package, generator, and target versions. Validate decimal/time semantics, hashing, repeated loads, corrections, required writes, and performance together. Cloud hosting does not remove these integration contracts.
-
-Use managed target tables for the first pilot unless an open-table design has a justified requirement. If adding Iceberg/external tables, assign catalog, writer, retention, maintenance, permission, and recovery owners. Do not place two refresh engines in charge of the same object without a deliberate design.
 
 ## Operate and govern by data product
 
@@ -192,3 +189,7 @@ Select the pilot described in this blueprint, name its business and technical ow
 | Receive implementation updates | [Scalefree newsletter registration](https://www.scalefree.com/) | Use the “Data Vault 2.GO / Build Better Data Platforms” newsletter form on the homepage. |
 
 Complete the pilot's reconciliation, access, recovery, and cost checks before extending the source scope. Record the results and the decision to proceed in the project repository.
+
+## License
+
+Copyright © 2026 Scalefree International GmbH. The original text, tables, and diagrams in this blueprint are licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Credit Scalefree, identify changes, and retain the applicable ShareAlike terms when distributing adaptations. See [LICENSE.md](LICENSE.md) for scope, attribution, and the governing legal code. Referenced software and third-party material retain their own licenses.

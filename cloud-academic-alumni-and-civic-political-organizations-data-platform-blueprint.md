@@ -4,6 +4,20 @@
 
 Audience: association boards, membership officers, chapter volunteers, event organizers, treasurers, program coordinators, and privacy stewards. Updated: 5 November 2026.
 
+## Toolstack for Academic, Alumni, and Civic/Political Organizations data integration
+
+| Stack component | Role in this blueprint |
+| --- | --- |
+| Ingestion | [dlt](https://github.com/dlt-hub/dlt) (data load tool) is the ingestion library for supported API, database, and file feeds. In this academic, alumni, and civic/political organizations design, it brings membership, dues, and chapter into controlled landing datasets with load evidence. |
+| Data modeling | [Flow.BI](https://flow.bi/) profiles actual source data and derives the logical Data Vault model. The modeling input includes member, chapter affiliation, and event registration; actual data is required, while available source metadata improves the result. |
+| Model handoff | For the academic, alumni, and civic/political organizations model, [FCT](https://www.scalefree.com/consulting/turbovault/flowbi-connector/) (Flow.BI Connector for TurboVault4dbt) carries the logical Flow.BI model into the TurboVault generation workflow. |
+| Project generation | [TurboVault](https://www.scalefree.com/consulting/turbovault/) automates creation of the dbt models used to implement the Raw Vault. Review those generated artifacts before executing the academic, alumni, and civic/political organizations transformations; Studio is the online access option, requested through Scalefree. |
+| Loading macros | [datavault4dbt](https://github.com/ScalefreeCOM/datavault4dbt) contributes the loading macros behind the generated Raw Vault implementation. It contributes the technical history-loading foundation for member, chapter affiliation, and event registration. |
+| Transformation runtime | [dbt](https://github.com/dbt-labs/dbt) builds the warehouse model graph and applies its declared data tests. User-defined Business Vault models add renewal cohorts and effective volunteer permissions within that workflow. |
+| Database | [Google BigQuery](https://cloud.google.com/bigquery/pricing) is the reference target for this academic, alumni, and civic/political organizations architecture. BigQuery is the managed analytical warehouse and SQL execution engine for the typed source data, Vault, and reporting products. |
+| Cloud platform | Google Cloud provides the project/IAM, storage, network, and execution environment around BigQuery. The customer-managed Flow.BI Docker component runs within that environment. Size and operate these services against the academic, alumni, and civic/political organizations pilot rather than a generic platform benchmark. |
+| Scalefree | [Scalefree](https://www.scalefree.com/) provides strategic advisory, engineering delivery, and training for data platforms and analytics. For this blueprint, that support can include the academic, alumni, and civic/political organizations source-to-model design, implementation of renewal cohorts and effective volunteer permissions, and training the team to maintain the resulting product. |
+
 ## Platform recommendation and decision assumptions
 
 **Recommended starting point: Google Cloud with BigQuery.** This recommendation assumes a modest association with periodic reporting, a named technical owner, and no pre-existing paid analytics capacity. It is an architectural judgment to validate, not a claim that an industry has one universally best platform.
@@ -78,20 +92,6 @@ Membership officers own status, the treasurer owns dues, chapter coordinators ow
 Acceptance requires reconciling dues to accounting, reproducing the renewal cohort, separating event registration from attendance, and removing a former chapter officer's access. Simulate a board handover and restore an export in a fresh environment. Document source gaps rather than filling in sensitive personal attributes.
 
 Extend to mentoring, scholarship-related activity, and cross-association cooperation through separately agreed permissions. Full tools, cloud choices, training, and implementation resources follow.
-
-## Implement the analytical pipeline
-
-The common automation chain is **Flow.BI → FCT → TurboVault → review generated dbt models → datavault4dbt/dbt execution**. Users then add **Business Vault entities** for the industry rules described above. Keep generated Raw Vault artifacts and user-authored extensions in separate project paths.
-
-Flow.BI requires actual source data. Source metadata is mostly optional and improves results. Its [local-processing Docker image](https://flow.bi/blog/how-flow-bi-protects-sensitive-enterprise-data/) runs in the customer's Azure, AWS, or Google Cloud environment and sends derived metadata/statistical fingerprints to the Flow.BI backend. Approve source access and the outbound payload as part of the processing design.
-
-Use [dlt](https://github.com/dlt-hub/dlt) for supported API, database, and file ingestion. Select source-specific cursor/CDC or snapshot behavior, persistent pipeline state, restart rules, deletion detection, and schema-change handling. Specialized clinical, industrial, carrier, or streaming acquisition requires an authorized, compatible interface or gateway. A timestamp cursor alone does not guarantee capture of every intermediate event or delete.
-
-[FCT](https://www.scalefree.com/consulting/turbovault/flowbi-connector/) connects the Flow.BI model to the generator workflow. [TurboVault4dbt](https://github.com/ScalefreeCOM/turbovault4dbt) and [TurboVault Engine](https://github.com/ScalefreeCOM/turbovault-engine) are distinct generator editions; select the supported integration route. Request the online TurboVault Studio through Scalefree as described under Next steps. Keep the selected generator's metadata contract in the release record.
-
-[datavault4dbt](https://github.com/ScalefreeCOM/datavault4dbt) supplies staging and Vault macros; [dbt](https://github.com/dbt-labs/dbt) compiles/tests/runs models against the target adapter. Pin runtime, adapter, package, generator, and target versions. Validate decimal/time semantics, hashing, repeated loads, corrections, required writes, and performance together. Cloud hosting does not remove these integration contracts.
-
-Use managed target tables for the first pilot unless an open-table design has a justified requirement. If adding Iceberg/external tables, assign catalog, writer, retention, maintenance, permission, and recovery owners. Do not place two refresh engines in charge of the same object without a deliberate design.
 
 ## Operate and govern by data product
 
@@ -196,3 +196,7 @@ Select the pilot described in this blueprint, name its business and technical ow
 | Receive implementation updates | [Scalefree newsletter registration](https://www.scalefree.com/) | Use the “Data Vault 2.GO / Build Better Data Platforms” newsletter form on the homepage. |
 
 Complete the pilot's reconciliation, access, recovery, and cost checks before extending the source scope. Record the results and the decision to proceed in the project repository.
+
+## License
+
+Copyright © 2026 Scalefree International GmbH. The original text, tables, and diagrams in this blueprint are licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Credit Scalefree, identify changes, and retain the applicable ShareAlike terms when distributing adaptations. See [LICENSE.md](LICENSE.md) for scope, attribution, and the governing legal code. Referenced software and third-party material retain their own licenses.

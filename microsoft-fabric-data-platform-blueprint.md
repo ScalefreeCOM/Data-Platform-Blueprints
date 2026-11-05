@@ -4,6 +4,16 @@
 
 Audience: Microsoft-oriented data teams, Power BI owners, SQL engineers, tenant administrators, and FinOps. Updated: 5 November 2026.
 
+## The components behind Microsoft Fabric reporting
+
+| Responsibility | Tools and contribution |
+| --- | --- |
+| Source intake and model discovery | [dlt](https://github.com/dlt-hub/dlt) (data load tool) is the ingestion library for supported API, database, and file feeds. In this microsoft fabric design, it brings approved source extracts, Warehouse tables, and Power BI products into controlled landing datasets with load evidence. [Flow.BI](https://flow.bi/) supplies the data-driven modeling stage that precedes physical model generation. The modeling input includes workspace, Warehouse model, and source batch; actual data is required, while available source metadata improves the result. |
+| Connector and generation | For the microsoft fabric model, [FCT](https://www.scalefree.com/consulting/turbovault/flowbi-connector/) (Flow.BI Connector for TurboVault4dbt) handles the connector handoff from Flow.BI to the downstream model generator. [TurboVault](https://www.scalefree.com/consulting/turbovault/) generates the dbt models from that metadata. Review those generated artifacts before executing the microsoft fabric transformations; Studio is the online access option, requested through Scalefree. |
+| Loading and business rules | [datavault4dbt](https://github.com/ScalefreeCOM/datavault4dbt) is the dbt macro package that implements standard Data Vault loading patterns. It contributes the technical history-loading foundation for workspace, Warehouse model, and source batch. [dbt](https://github.com/dbt-labs/dbt) provides the build-and-test workflow that executes the model dependencies on the database. User-defined Business Vault models add organization-specific SQL rules and semantic measures within that workflow. |
+| Database and cloud | [Microsoft Fabric Warehouse](https://learn.microsoft.com/en-sg/fabric/fundamentals/decision-guide-lakehouse-warehouse) is the reference target for this microsoft fabric architecture. Microsoft Fabric is the managed analytics platform; its Warehouse is the SQL target for staging, Vault models, and marts in this design. Power BI supplies the reporting/semantic delivery path. Azure is the cloud ecosystem for the Fabric deployment and the customer-controlled source/profiling environment; tenant identity, networking, storage, capacity, and execution need explicit owners. Size and operate these services against the microsoft fabric pilot rather than a generic platform benchmark. |
+| Delivery and capability | [Scalefree](https://www.scalefree.com/) provides data and AI consulting, Data Vault implementation, software integration, and training. For this blueprint, that support can include the microsoft fabric source-to-model design, implementation of organization-specific SQL rules and semantic measures, and training the team to maintain the resulting product. |
+
 ## Make the operating-model decision first
 
 Fabric is a starting point when existing Microsoft identity, SQL skills, and Power BI delivery can support a more unified analytics operating model. The business case is fewer integration handoffs and faster governed reporting. Confirm the actual license and capacity requirements rather than assuming existing Microsoft 365 subscriptions cover the platform.
@@ -128,3 +138,7 @@ Select the pilot described in this blueprint, name its business and technical ow
 | Receive implementation updates | [Scalefree newsletter registration](https://www.scalefree.com/) | Use the “Data Vault 2.GO / Build Better Data Platforms” newsletter form on the homepage. |
 
 Complete the pilot's reconciliation, access, recovery, and cost checks before extending the source scope. Record the results and the decision to proceed in the project repository.
+
+## License
+
+Copyright © 2026 Scalefree International GmbH. The original text, tables, and diagrams in this blueprint are licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Credit Scalefree, identify changes, and retain the applicable ShareAlike terms when distributing adaptations. See [LICENSE.md](LICENSE.md) for scope, attribution, and the governing legal code. Referenced software and third-party material retain their own licenses.

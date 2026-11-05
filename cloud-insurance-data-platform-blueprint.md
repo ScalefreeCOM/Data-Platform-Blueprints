@@ -4,6 +4,17 @@
 
 Audience: claims, underwriting, actuarial, finance, compliance, operations, and data teams. Updated: 5 November 2026.
 
+## Building the Insurance pipeline with Scalefree
+
+The insurance stack has four connected responsibilities:
+
+- [dlt](https://github.com/dlt-hub/dlt) (data load tool) is the ingestion library for supported API, database, and file feeds. In this insurance design, it brings policy administration, claims, and payment into controlled landing datasets with load evidence. [Flow.BI](https://flow.bi/) provides AI-assisted Data Vault modeling grounded in actual source data. The modeling input includes policy term, coverage, and claim component; actual data is required, while available source metadata improves the result.
+- For the insurance model, [FCT](https://www.scalefree.com/consulting/turbovault/flowbi-connector/) (Flow.BI Connector for TurboVault4dbt) bridges Flow.BI and TurboVault by transferring the generated model in the required metadata form. [TurboVault](https://www.scalefree.com/consulting/turbovault/) turns the transferred metadata into dbt model files. Review those generated artifacts before executing the insurance transformations; Studio is the online access option, requested through Scalefree.
+- [datavault4dbt](https://github.com/ScalefreeCOM/datavault4dbt) encodes reusable Data Vault SQL patterns in a package consumed by dbt. It contributes the technical history-loading foundation for policy term, coverage, and claim component. [dbt](https://github.com/dbt-labs/dbt) is the SQL transformation runtime and testing workflow for the generated and user-authored models. User-defined Business Vault models add coverage-at-loss relationships and development buckets within that workflow.
+- [Snowflake on AWS](https://docs.snowflake.com/en/user-guide/cost-understanding-overall) is the reference target for this insurance architecture. Snowflake supplies the SQL data warehouse for integrated history and serving models. Loading, transformation, and reporting workloads need their own sizing and cost attribution. AWS is the underlying cloud for this Snowflake deployment and provides the surrounding customer environment for object landing, container execution, networking, and identity integration. Size and operate these services against the insurance pilot rather than a generic platform benchmark.
+
+[Scalefree](https://www.scalefree.com/) brings architecture advice, hands-on implementation, Data Vault tooling, and training to platform projects. For this blueprint, that support can include the insurance source-to-model design, implementation of coverage-at-loss relationships and development buckets, and training the team to maintain the resulting product.
+
 ## Platform recommendation and decision assumptions
 
 **Recommended starting point: Snowflake on AWS.** This recommendation assumes a SQL-oriented insurer with AWS-centered source landing and actuarial/reporting consumers. It is an architectural judgment to validate, not a claim that an industry has one universally best platform.
@@ -76,20 +87,6 @@ Claims operations owns lifecycle semantics; actuarial owns development definitio
 Acceptance requires reconstructing two valuation cutoffs, reconciling payments to the agreed ledger, resolving coverage associations for a sampled set of losses, and regenerating the Raw Vault without overwriting Business Vault rules. Exercise a reopened claim and a corrected reserve. Record unresolved breaks and the accountable report-release owner.
 
 Scale from this product to underwriting profitability, reinsurance, and regulatory datasets only after definitions and reconciliation are stable. Use the full technology, cloud, training, and resource guidance below to implement this workflow.
-
-## Implement the analytical pipeline
-
-The common automation chain is **Flow.BI → FCT → TurboVault → review generated dbt models → datavault4dbt/dbt execution**. Users then add **Business Vault entities** for the industry rules described above. Keep generated Raw Vault artifacts and user-authored extensions in separate project paths.
-
-Flow.BI requires actual source data. Source metadata is mostly optional and improves results. Its [local-processing Docker image](https://flow.bi/blog/how-flow-bi-protects-sensitive-enterprise-data/) runs in the customer's Azure, AWS, or Google Cloud environment and sends derived metadata/statistical fingerprints to the Flow.BI backend. Approve source access and the outbound payload as part of the processing design.
-
-Use [dlt](https://github.com/dlt-hub/dlt) for supported API, database, and file ingestion. Select source-specific cursor/CDC or snapshot behavior, persistent pipeline state, restart rules, deletion detection, and schema-change handling. Specialized clinical, industrial, carrier, or streaming acquisition requires an authorized, compatible interface or gateway. A timestamp cursor alone does not guarantee capture of every intermediate event or delete.
-
-[FCT](https://www.scalefree.com/consulting/turbovault/flowbi-connector/) connects the Flow.BI model to the generator workflow. [TurboVault4dbt](https://github.com/ScalefreeCOM/turbovault4dbt) and [TurboVault Engine](https://github.com/ScalefreeCOM/turbovault-engine) are distinct generator editions; select the supported integration route. Request the online TurboVault Studio through Scalefree as described under Next steps. Keep the selected generator's metadata contract in the release record.
-
-[datavault4dbt](https://github.com/ScalefreeCOM/datavault4dbt) supplies staging and Vault macros; [dbt](https://github.com/dbt-labs/dbt) compiles/tests/runs models against the target adapter. Pin runtime, adapter, package, generator, and target versions. Validate decimal/time semantics, hashing, repeated loads, corrections, required writes, and performance together. Cloud hosting does not remove these integration contracts.
-
-Use managed target tables for the first pilot unless an open-table design has a justified requirement. If adding Iceberg/external tables, assign catalog, writer, retention, maintenance, permission, and recovery owners. Do not place two refresh engines in charge of the same object without a deliberate design.
 
 ## Operate and govern by data product
 
@@ -194,3 +191,7 @@ Select the pilot described in this blueprint, name its business and technical ow
 | Receive implementation updates | [Scalefree newsletter registration](https://www.scalefree.com/) | Use the “Data Vault 2.GO / Build Better Data Platforms” newsletter form on the homepage. |
 
 Complete the pilot's reconciliation, access, recovery, and cost checks before extending the source scope. Record the results and the decision to proceed in the project repository.
+
+## License
+
+Copyright © 2026 Scalefree International GmbH. The original text, tables, and diagrams in this blueprint are licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Credit Scalefree, identify changes, and retain the applicable ShareAlike terms when distributing adaptations. See [LICENSE.md](LICENSE.md) for scope, attribution, and the governing legal code. Referenced software and third-party material retain their own licenses.

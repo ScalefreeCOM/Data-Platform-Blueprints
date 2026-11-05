@@ -4,6 +4,17 @@
 
 Audience: data engineering, ML/AI teams, analytics engineers, platform security, operations, and FinOps. Updated: 5 November 2026.
 
+## From source event to a governed Databricks data product
+
+The databricks stack has four connected responsibilities:
+
+- [dlt](https://github.com/dlt-hub/dlt) (data load tool) is the ingestion library for supported API, database, and file feeds. In this databricks design, it brings approved events, files, and typed tables into controlled landing datasets with load evidence. [Flow.BI](https://flow.bi/) analyzes source values and relationships to generate the logical Data Vault structure. The modeling input includes source event, Delta table, and catalog object; actual data is required, while available source metadata improves the result.
+- For the databricks model, [FCT](https://www.scalefree.com/consulting/turbovault/flowbi-connector/) (Flow.BI Connector for TurboVault4dbt) connects the modeling service to the generator by retrieving and transforming Flow.BI output. [TurboVault](https://www.scalefree.com/consulting/turbovault/) translates Data Vault metadata into the dbt model layer. Review those generated artifacts before executing the databricks transformations; Studio is the online access option, requested through Scalefree.
+- [datavault4dbt](https://github.com/ScalefreeCOM/datavault4dbt) supplies reusable loading logic for staging and the required Vault entity types. It contributes the technical history-loading foundation for source event, Delta table, and catalog object. [dbt](https://github.com/dbt-labs/dbt) compiles model SQL, resolves dependencies, runs transformations, and executes tests on the target. User-defined Business Vault models add event-derived relationships and business features within that workflow.
+- [Databricks SQL and lakehouse tables](https://docs.databricks.com/aws/en/getting-started/architecture) is the reference target for this databricks architecture. Databricks supplies the engineering and SQL compute; governed lakehouse tables hold source history, Vault entities, and derived products. This separates the query/runtime role from the underlying object storage. Deploy Databricks in the approved Azure, AWS, or Google Cloud environment near the source data and operational skills. That cloud supplies the surrounding storage, network, identity, and customer profiling runtime. Size and operate these services against the databricks pilot rather than a generic platform benchmark.
+
+[Scalefree](https://www.scalefree.com/) combines data-platform advisory, implementation delivery, automation tooling, and team training. For this blueprint, that support can include the databricks source-to-model design, implementation of event-derived relationships and business features, and training the team to maintain the resulting product.
+
 ## Use the lakehouse where mixed workloads justify it
 
 Choose Databricks when the platform must combine substantial event/file processing, engineering transformations, SQL consumption, and model-development workflows. The value proposition depends on reducing duplicate pipelines and operating effort across those workloads. A modest SQL reporting product may have a simpler alternative.
@@ -133,3 +144,7 @@ Select the pilot described in this blueprint, name its business and technical ow
 | Receive implementation updates | [Scalefree newsletter registration](https://www.scalefree.com/) | Use the “Data Vault 2.GO / Build Better Data Platforms” newsletter form on the homepage. |
 
 Complete the pilot's reconciliation, access, recovery, and cost checks before extending the source scope. Record the results and the decision to proceed in the project repository.
+
+## License
+
+Copyright © 2026 Scalefree International GmbH. The original text, tables, and diagrams in this blueprint are licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Credit Scalefree, identify changes, and retain the applicable ShareAlike terms when distributing adaptations. See [LICENSE.md](LICENSE.md) for scope, attribution, and the governing legal code. Referenced software and third-party material retain their own licenses.

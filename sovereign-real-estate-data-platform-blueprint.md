@@ -4,7 +4,18 @@
 
 Audience: sector operations, domain specialists, finance/commercial teams, security, governance, and data engineering. Updated: 5 November 2026.
 
-## Begin with an accountable operating workflow
+## Data Vault automation and platform choices for Real Estate
+
+The real estate stack has four connected responsibilities:
+
+- [dlt](https://github.com/dlt-hub/dlt) (data load tool) is the ingestion library for supported API, database, and file feeds. In this real estate design, it brings property management, lease administration, and tenancy CRM into controlled landing datasets with load evidence. [Flow.BI](https://flow.bi/) builds a logical Data Vault from profiled source datasets and their relationships. The modeling input includes property, building, and unit; actual data is required, while available source metadata improves the result.
+- For the real estate model, [FCT](https://www.scalefree.com/consulting/turbovault/flowbi-connector/) (Flow.BI Connector for TurboVault4dbt) retrieves and translates the generated model into metadata for the generator. [TurboVault](https://www.scalefree.com/consulting/turbovault/) creates physical-model definitions as dbt project artifacts. Review those generated artifacts before executing the real estate transformations; Studio is the online access option, requested through Scalefree.
+- [datavault4dbt](https://github.com/ScalefreeCOM/datavault4dbt) provides the transformation templates for staging and historized Vault entities. It contributes the technical history-loading foundation for property, building, and unit. [dbt](https://github.com/dbt-labs/dbt) orchestrates the SQL model dependency graph through compilation, execution, and tests. User-defined Business Vault models add rent-free periods and effective rent within that workflow.
+- The reference database paths are [PostgreSQL](https://www.postgresql.org/about/licence/) for a bounded relational pilot and [Trino with Iceberg](https://trino.io/docs/current/connector/iceberg.html) for the larger lakehouse pattern. PostgreSQL stores and executes relational models; Trino queries and transforms Iceberg tables held in object storage through a catalog. For real estate, Azure, AWS, or Google Cloud hosts the approved data, runtime, storage, and network services. The cloud choice must satisfy the operating, access, key-custody, and portability requirements defined in this document.
+
+[Scalefree](https://www.scalefree.com/) helps organizations plan, implement, automate, and operate data and analytics solutions. For this blueprint, that support can include the real estate source-to-model design, implementation of rent-free periods and effective rent, and training the team to maintain the resulting product.
+
+## Real Estate: operational workflow and source evidence
 
 The first data product addresses this decision: **explain property income, occupancy, lease obligations, and operating cost across ownership and management structures.** Start with one bounded business unit, contract/product family, site, or reporting period and name the owner of the resulting decision. The pilot draws from property management, lease administration, tenancy CRM, work orders, valuations, and accounting.
 
@@ -17,7 +28,7 @@ The first data product addresses this decision: **explain property income, occup
 
 Preserve the planned or promised position as well as actual execution. Maintain source-event time, business-effective time, arrival/load time, correction references, and the cutoff used for reporting. A late or missing delivery remains a visible data-quality state; it should not silently become zero activity.
 
-## Model the sector's entities and history
+## Data Vault entities and fact grain for real estate
 
 The business vocabulary includes **property, building, unit, area measurement, owner, management mandate, lease version, tenant role, charge, and valuation**. The proposed fact grain is **lettable unit × lease-effective interval × area basis, with charge lines maintained separately**. Keep identifiers namespaced by the issuing system and organization. Distinguish source facts from estimates, allocations, approved business rules, and publication snapshots.
 
@@ -25,13 +36,13 @@ Flow.BI profiles required actual data; mostly optional source metadata improves 
 
 Use the vocabulary to validate source semantics and define user-authored extensions. Review the generated implementation after TurboVault. Record the relevant package, adapter, generator, source-schema, rule, and runtime versions together.
 
-## Worked example and calculation contract
+## Worked real estate example: calculation and reporting scope
 
 A property has 10,000 square metres of defined lettable area and 8,000 leased: area occupancy is 80%. Eight occupied units out of ten can imply the same number accidentally, but unit occupancy is a different measure. Exclude or include refurbishment space only through an explicit denominator policy.
 
 Keep the calculation's numerator, denominator, unit/currency, eligible population, business calendar, cutoff, exclusions, and rule version with the published product. Original evidence and corrected knowledge should support both reconstruction of the earlier report and a separately identified restatement.
 
-## Design around the difficult cases
+## Corrections, exceptions, and access in real estate
 
 Exercise **lease renewals, unit subdivision, shared costs, management changes, and backdated service-charge corrections**. Build explicit associations for revisions and reversals so an event replay does not become a second business event. Measure reconciliation breaks at the fact grain before joining to descriptive or many-to-many relationships.
 
@@ -104,17 +115,6 @@ For this organization blueprint, require the following deployment deliverables:
 - Deploy it beside approved landing data, within the organization's own cloud account/subscription/project. Use an approved container host, private networking, scoped credentials, and controlled temporary storage.
 - Classify and approve the outbound profiling payload. Structural metadata and fingerprints require review even when raw records stay local.
 - Test source/storage access, controlled egress, restart, resource limits, update procedures, and intermediate-data cleanup.
-
-#### Required tools and responsibilities
-
-| Component | Role in this blueprint | License and sovereignty treatment |
-| --- | --- | --- |
-| [dlt — data load tool](https://github.com/dlt-hub/dlt) | Extract and load approved source data into controlled landing datasets. | Open-source Python library, Apache-2.0. Run in organization-controlled infrastructure; review individual sources and dependencies. |
-| [Flow.BI](https://flow.bi/) | Profile required source data and generate integrated Data Vault models; mostly optional source metadata improves the results. | Deploy the local-processing Docker image as described above. Review proprietary licensing, backend processing, and service terms separately. |
-| [FCT — Flow.BI Connector for TurboVault4dbt](https://www.scalefree.com/consulting/turbovault/flowbi-connector/) | Transfer the Flow.BI model into the TurboVault workflow. | FCT is available for free download and use on Windows and Linux. |
-| [TurboVault4dbt](https://github.com/ScalefreeCOM/turbovault4dbt) | Generate dbt models from Data Vault metadata. | Apache-2.0. Proposed baseline for the FCT integration; pin a tested release. |
-| [datavault4dbt](https://github.com/ScalefreeCOM/datavault4dbt) | Supply macros for staging and Data Vault transformations executed through dbt. | Apache-2.0. Validate the required macros against the selected database and adapter. |
-| [dbt](https://github.com/dbt-labs/dbt) | Compile, test, and run transformation models. | Select an explicitly licensed open-source runtime/distribution and compatible adapter. Record the exact artifact and version rather than assuming every dbt-branded offering has the same terms. |
 
 **FCT public website and registration form:** use the [official connector access page](https://www.scalefree.com/consulting/turbovault/flowbi-connector/) to request access. Registration is a vendor onboarding step for the connector. Assign a designated owner for credentials and download provenance. Verify whether ongoing connectivity or credentials are needed during operation.
 
@@ -265,3 +265,7 @@ Select the pilot described in this blueprint, name its business and technical ow
 | Receive implementation updates | [Scalefree newsletter registration](https://www.scalefree.com/) | Use the “Data Vault 2.GO / Build Better Data Platforms” newsletter form on the homepage. |
 
 Complete the pilot's reconciliation, access, recovery, and cost checks before extending the source scope. Record the results and the decision to proceed in the project repository.
+
+## License
+
+Copyright © 2026 Scalefree International GmbH. The original text, tables, and diagrams in this blueprint are licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Credit Scalefree, identify changes, and retain the applicable ShareAlike terms when distributing adaptations. See [LICENSE.md](LICENSE.md) for scope, attribution, and the governing legal code. Referenced software and third-party material retain their own licenses.

@@ -4,6 +4,22 @@
 
 Audience: registry, admissions, institutional research, finance, research administration, and data teams. Updated: 5 November 2026.
 
+## Data Vault automation and platform choices for Higher Education
+
+### Discover and generate the model
+
+[dlt](https://github.com/dlt-hub/dlt) (data load tool) is the ingestion library for supported API, database, and file feeds. In this higher education design, it brings admissions, student records, and registry control extracts into controlled landing datasets with load evidence. [Flow.BI](https://flow.bi/) builds a logical Data Vault from profiled source datasets and their relationships. The modeling input includes person, application, and program; actual data is required, while available source metadata improves the result. For the higher education model, [FCT](https://www.scalefree.com/consulting/turbovault/flowbi-connector/) (Flow.BI Connector for TurboVault4dbt) retrieves and translates the generated model into metadata for the generator. [TurboVault](https://www.scalefree.com/consulting/turbovault/) creates physical-model definitions as dbt project artifacts. Review those generated artifacts before executing the higher education transformations; Studio is the online access option, requested through Scalefree.
+
+### Execute and extend the data product
+
+[datavault4dbt](https://github.com/ScalefreeCOM/datavault4dbt) provides the transformation templates for staging and historized Vault entities. It contributes the technical history-loading foundation for person, application, and program. [dbt](https://github.com/dbt-labs/dbt) orchestrates the SQL model dependency graph through compilation, execution, and tests. User-defined Business Vault models add cohort membership and historical faculty mappings within that workflow.
+
+### Choose the runtime and delivery support
+
+[Microsoft Fabric Warehouse](https://learn.microsoft.com/en-sg/fabric/fundamentals/decision-guide-lakehouse-warehouse) is the reference target for this higher education architecture. Microsoft Fabric is the managed analytics platform; its Warehouse is the SQL target for staging, Vault models, and marts in this design. Power BI supplies the reporting/semantic delivery path. Azure is the cloud ecosystem for the Fabric deployment and the customer-controlled source/profiling environment; tenant identity, networking, storage, capacity, and execution need explicit owners. Size and operate these services against the higher education pilot rather than a generic platform benchmark.
+
+[Scalefree](https://www.scalefree.com/) helps organizations plan, implement, automate, and operate data and analytics solutions. For this blueprint, that support can include the higher education source-to-model design, implementation of cohort membership and historical faculty mappings, and training the team to maintain the resulting product.
+
 ## Platform recommendation and decision assumptions
 
 **Recommended starting point: Microsoft Fabric on Azure.** This recommendation assumes a Microsoft-oriented university team with established Power BI delivery and predominantly structured student/finance reporting. It is an architectural judgment to validate, not a claim that an industry has one universally best platform.
@@ -59,20 +75,6 @@ Keep original cohort membership and the rule for withdrawn applications, deferra
 Registry approves enrollment definitions, admissions owns application history, institutional research owns measures, and privacy owners govern cross-domain use. Protect sensitive demographics, assessment details, and research data separately from aggregate institutional reporting. The [GDPR](https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng) and applicable education/records requirements inform local governance.
 
 Accept the pilot when source counts reconcile, multi-application applicants do not inflate person counts, a deferred enrollment is handled correctly, and two report cutoffs can be reproduced. Test faculty-based restrictions through SQL and export. Train analysts on cohort denominators, modelers on academic grain, and operators on corrections and term rollover.
-
-## Implement the analytical pipeline
-
-The common automation chain is **Flow.BI → FCT → TurboVault → review generated dbt models → datavault4dbt/dbt execution**. Users then add **Business Vault entities** for the industry rules described above. Keep generated Raw Vault artifacts and user-authored extensions in separate project paths.
-
-Flow.BI requires actual source data. Source metadata is mostly optional and improves results. Its [local-processing Docker image](https://flow.bi/blog/how-flow-bi-protects-sensitive-enterprise-data/) runs in the customer's Azure, AWS, or Google Cloud environment and sends derived metadata/statistical fingerprints to the Flow.BI backend. Approve source access and the outbound payload as part of the processing design.
-
-Use [dlt](https://github.com/dlt-hub/dlt) for supported API, database, and file ingestion. Select source-specific cursor/CDC or snapshot behavior, persistent pipeline state, restart rules, deletion detection, and schema-change handling. Specialized clinical, industrial, carrier, or streaming acquisition requires an authorized, compatible interface or gateway. A timestamp cursor alone does not guarantee capture of every intermediate event or delete.
-
-[FCT](https://www.scalefree.com/consulting/turbovault/flowbi-connector/) connects the Flow.BI model to the generator workflow. [TurboVault4dbt](https://github.com/ScalefreeCOM/turbovault4dbt) and [TurboVault Engine](https://github.com/ScalefreeCOM/turbovault-engine) are distinct generator editions; select the supported integration route. Request the online TurboVault Studio through Scalefree as described under Next steps. Keep the selected generator's metadata contract in the release record.
-
-[datavault4dbt](https://github.com/ScalefreeCOM/datavault4dbt) supplies staging and Vault macros; [dbt](https://github.com/dbt-labs/dbt) compiles/tests/runs models against the target adapter. Pin runtime, adapter, package, generator, and target versions. Validate decimal/time semantics, hashing, repeated loads, corrections, required writes, and performance together. Cloud hosting does not remove these integration contracts.
-
-Use managed target tables for the first pilot unless an open-table design has a justified requirement. If adding Iceberg/external tables, assign catalog, writer, retention, maintenance, permission, and recovery owners. Do not place two refresh engines in charge of the same object without a deliberate design.
 
 ## Operate and govern by data product
 
@@ -177,3 +179,7 @@ Select the pilot described in this blueprint, name its business and technical ow
 | Receive implementation updates | [Scalefree newsletter registration](https://www.scalefree.com/) | Use the “Data Vault 2.GO / Build Better Data Platforms” newsletter form on the homepage. |
 
 Complete the pilot's reconciliation, access, recovery, and cost checks before extending the source scope. Record the results and the decision to proceed in the project repository.
+
+## License
+
+Copyright © 2026 Scalefree International GmbH. The original text, tables, and diagrams in this blueprint are licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Credit Scalefree, identify changes, and retain the applicable ShareAlike terms when distributing adaptations. See [LICENSE.md](LICENSE.md) for scope, attribution, and the governing legal code. Referenced software and third-party material retain their own licenses.

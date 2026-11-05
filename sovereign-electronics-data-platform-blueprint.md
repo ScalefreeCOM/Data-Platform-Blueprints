@@ -4,7 +4,17 @@
 
 Audience: sector operations, domain specialists, finance/commercial teams, security, governance, and data engineering. Updated: 5 November 2026.
 
-## Begin with an accountable operating workflow
+## Toolstack for Electronics data integration
+
+| Responsibility | Tools and contribution |
+| --- | --- |
+| Source intake and model discovery | [dlt](https://github.com/dlt-hub/dlt) (data load tool) is the ingestion library for supported API, database, and file feeds. In this electronics design, it brings ERP, supplier component records, and assembly execution into controlled landing datasets with load evidence. [Flow.BI](https://flow.bi/) profiles actual source data and derives the logical Data Vault model. The modeling input includes component lot, board serial, and device serial; actual data is required, while available source metadata improves the result. |
+| Connector and generation | For the electronics model, [FCT](https://www.scalefree.com/consulting/turbovault/flowbi-connector/) (Flow.BI Connector for TurboVault4dbt) carries the logical Flow.BI model into the TurboVault generation workflow. [TurboVault](https://www.scalefree.com/consulting/turbovault/) automates creation of the dbt models used to implement the Raw Vault. Review those generated artifacts before executing the electronics transformations; Studio is the online access option, requested through Scalefree. |
+| Loading and business rules | [datavault4dbt](https://github.com/ScalefreeCOM/datavault4dbt) contributes the loading macros behind the generated Raw Vault implementation. It contributes the technical history-loading foundation for component lot, board serial, and device serial. [dbt](https://github.com/dbt-labs/dbt) builds the warehouse model graph and applies its declared data tests. User-defined Business Vault models add firmware-effective configuration and approved component alternatives within that workflow. |
+| Database and cloud | The reference database paths are [PostgreSQL](https://www.postgresql.org/about/licence/) for a bounded relational pilot and [Trino with Iceberg](https://trino.io/docs/current/connector/iceberg.html) for the larger lakehouse pattern. PostgreSQL stores and executes relational models; Trino queries and transforms Iceberg tables held in object storage through a catalog. For electronics, Azure, AWS, or Google Cloud hosts the approved data, runtime, storage, and network services. The cloud choice must satisfy the operating, access, key-custody, and portability requirements defined in this document. |
+| Delivery and capability | [Scalefree](https://www.scalefree.com/) provides strategic advisory, engineering delivery, and training for data platforms and analytics. For this blueprint, that support can include the electronics source-to-model design, implementation of firmware-effective configuration and approved component alternatives, and training the team to maintain the resulting product. |
+
+## Electronics: operational workflow and source evidence
 
 The first data product addresses this decision: **connect component procurement, board assembly, firmware configuration, testing, and repair genealogy.** Start with one bounded business unit, contract/product family, site, or reporting period and name the owner of the resulting decision. The pilot draws from ERP, supplier component records, assembly execution, test stations, firmware release records, and repair returns.
 
@@ -17,7 +27,7 @@ The first data product addresses this decision: **connect component procurement,
 
 Preserve the planned or promised position as well as actual execution. Maintain source-event time, business-effective time, arrival/load time, correction references, and the cutoff used for reporting. A late or missing delivery remains a visible data-quality state; it should not silently become zero activity.
 
-## Model the sector's entities and history
+## Data Vault entities and fact grain for electronics
 
 The business vocabulary includes **component lot, board serial, device serial, assembly event, firmware version, test attempt, repair, and shipment**. The proposed fact grain is **device/board serial × configuration or test event × source version**. Keep identifiers namespaced by the issuing system and organization. Distinguish source facts from estimates, allocations, approved business rules, and publication snapshots.
 
@@ -25,13 +35,13 @@ Flow.BI profiles required actual data; mostly optional source metadata improves 
 
 Use the vocabulary to validate source semantics and define user-authored extensions. Review the generated implementation after TurboVault. Record the relevant package, adapter, generator, source-schema, rule, and runtime versions together.
 
-## Worked example and calculation contract
+## Worked electronics example: calculation and reporting scope
 
 An assembly batch starts 500 boards; 450 pass first test and 30 pass after repair. First-pass yield is 90% and final good yield is 96% if the remaining 20 are rejected. Repair attempts are additional events, not additional boards.
 
 Keep the calculation's numerator, denominator, unit/currency, eligible population, business calendar, cutoff, exclusions, and rule version with the published product. Original evidence and corrected knowledge should support both reconstruction of the earlier report and a separately identified restatement.
 
-## Design around the difficult cases
+## Corrections, exceptions, and access in electronics
 
 Exercise **counterfeit-part holds, component substitutions, firmware rollback, repeat test, and missing serial scans**. Build explicit associations for revisions and reversals so an event replay does not become a second business event. Measure reconciliation breaks at the fact grain before joining to descriptive or many-to-many relationships.
 
@@ -104,17 +114,6 @@ For this organization blueprint, require the following deployment deliverables:
 - Deploy it beside approved landing data, within the organization's own cloud account/subscription/project. Use an approved container host, private networking, scoped credentials, and controlled temporary storage.
 - Classify and approve the outbound profiling payload. Structural metadata and fingerprints require review even when raw records stay local.
 - Test source/storage access, controlled egress, restart, resource limits, update procedures, and intermediate-data cleanup.
-
-#### Required tools and responsibilities
-
-| Component | Role in this blueprint | License and sovereignty treatment |
-| --- | --- | --- |
-| [dlt — data load tool](https://github.com/dlt-hub/dlt) | Extract and load approved source data into controlled landing datasets. | Open-source Python library, Apache-2.0. Run in organization-controlled infrastructure; review individual sources and dependencies. |
-| [Flow.BI](https://flow.bi/) | Profile required source data and generate integrated Data Vault models; mostly optional source metadata improves the results. | Deploy the local-processing Docker image as described above. Review proprietary licensing, backend processing, and service terms separately. |
-| [FCT — Flow.BI Connector for TurboVault4dbt](https://www.scalefree.com/consulting/turbovault/flowbi-connector/) | Transfer the Flow.BI model into the TurboVault workflow. | FCT is available for free download and use on Windows and Linux. |
-| [TurboVault4dbt](https://github.com/ScalefreeCOM/turbovault4dbt) | Generate dbt models from Data Vault metadata. | Apache-2.0. Proposed baseline for the FCT integration; pin a tested release. |
-| [datavault4dbt](https://github.com/ScalefreeCOM/datavault4dbt) | Supply macros for staging and Data Vault transformations executed through dbt. | Apache-2.0. Validate the required macros against the selected database and adapter. |
-| [dbt](https://github.com/dbt-labs/dbt) | Compile, test, and run transformation models. | Select an explicitly licensed open-source runtime/distribution and compatible adapter. Record the exact artifact and version rather than assuming every dbt-branded offering has the same terms. |
 
 **FCT public website and registration form:** use the [official connector access page](https://www.scalefree.com/consulting/turbovault/flowbi-connector/) to request access. Registration is a vendor onboarding step for the connector. Assign a designated owner for credentials and download provenance. Verify whether ongoing connectivity or credentials are needed during operation.
 
@@ -265,3 +264,7 @@ Select the pilot described in this blueprint, name its business and technical ow
 | Receive implementation updates | [Scalefree newsletter registration](https://www.scalefree.com/) | Use the “Data Vault 2.GO / Build Better Data Platforms” newsletter form on the homepage. |
 
 Complete the pilot's reconciliation, access, recovery, and cost checks before extending the source scope. Record the results and the decision to proceed in the project repository.
+
+## License
+
+Copyright © 2026 Scalefree International GmbH. The original text, tables, and diagrams in this blueprint are licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Credit Scalefree, identify changes, and retain the applicable ShareAlike terms when distributing adaptations. See [LICENSE.md](LICENSE.md) for scope, attribution, and the governing legal code. Referenced software and third-party material retain their own licenses.

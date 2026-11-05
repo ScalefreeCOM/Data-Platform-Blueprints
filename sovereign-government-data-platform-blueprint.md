@@ -4,6 +4,18 @@
 
 Audience: public-service owners, agency leadership, records officers, information governance, finance, security, and data teams. Updated: 5 November 2026.
 
+## Technology roles in Government analytics
+
+**Source evidence and model inputs.** [dlt](https://github.com/dlt-hub/dlt) (data load tool) is the ingestion library for supported API, database, and file feeds. In this government design, it brings case management, application, and decision into controlled landing datasets with load evidence. [Flow.BI](https://flow.bi/) derives hubs, links, satellites, and their relationships from the data it profiles. The modeling input includes case, application, and authority; actual data is required, while available source metadata improves the result.
+
+**Logical model to generated SQL.** For the government model, [FCT](https://www.scalefree.com/consulting/turbovault/flowbi-connector/) (Flow.BI Connector for TurboVault4dbt) passes the generated logical model from Flow.BI into the TurboVault metadata workflow. [TurboVault](https://www.scalefree.com/consulting/turbovault/) generates model artifacts so the implementation follows the supplied metadata. Review those generated artifacts before executing the government transformations; Studio is the online access option, requested through Scalefree.
+
+**A maintained analytical product.** [datavault4dbt](https://github.com/ScalefreeCOM/datavault4dbt) supplies the reusable staging, hub, link, and satellite macros invoked by the models. It contributes the technical history-loading foundation for case, application, and authority. [dbt](https://github.com/dbt-labs/dbt) runs the versioned SQL transformation project and its quality tests against the selected engine. User-defined Business Vault models add statutory clocks and disclosure-approved aggregates within that workflow.
+
+The reference database paths are [PostgreSQL](https://www.postgresql.org/about/licence/) for a bounded relational pilot and [Trino with Iceberg](https://trino.io/docs/current/connector/iceberg.html) for the larger lakehouse pattern. PostgreSQL stores and executes relational models; Trino queries and transforms Iceberg tables held in object storage through a catalog. For government, Azure, AWS, or Google Cloud hosts the approved data, runtime, storage, and network services. The cloud choice must satisfy the operating, access, key-custody, and portability requirements defined in this document.
+
+[Scalefree](https://www.scalefree.com/) supports the data-platform lifecycle through architecture, engineering, governance, and skills development. For this blueprint, that support can include the government source-to-model design, implementation of statutory clocks and disclosure-approved aggregates, and training the team to maintain the resulting product.
+
 ## Organize around a public-service case
 
 A government platform must explain what an agency received, what evidence it considered, which rule version applied, and how a decision or payment changed. Shared identity does not automatically create authority to share records across services.
@@ -98,17 +110,6 @@ For this organization blueprint, require the following deployment deliverables:
 - Deploy it beside approved landing data, within the organization's own cloud account/subscription/project. Use an approved container host, private networking, scoped credentials, and controlled temporary storage.
 - Classify and approve the outbound profiling payload. Structural metadata and fingerprints require review even when raw records stay local.
 - Test source/storage access, controlled egress, restart, resource limits, update procedures, and intermediate-data cleanup.
-
-#### Required tools and responsibilities
-
-| Component | Role in this blueprint | License and sovereignty treatment |
-| --- | --- | --- |
-| [dlt — data load tool](https://github.com/dlt-hub/dlt) | Extract and load approved source data into controlled landing datasets. | Open-source Python library, Apache-2.0. Run in organization-controlled infrastructure; review individual sources and dependencies. |
-| [Flow.BI](https://flow.bi/) | Profile required source data and generate integrated Data Vault models; mostly optional source metadata improves the results. | Deploy the local-processing Docker image as described above. Review proprietary licensing, backend processing, and service terms separately. |
-| [FCT — Flow.BI Connector for TurboVault4dbt](https://www.scalefree.com/consulting/turbovault/flowbi-connector/) | Transfer the Flow.BI model into the TurboVault workflow. | FCT is available for free download and use on Windows and Linux. |
-| [TurboVault4dbt](https://github.com/ScalefreeCOM/turbovault4dbt) | Generate dbt models from Data Vault metadata. | Apache-2.0. Proposed baseline for the FCT integration; pin a tested release. |
-| [datavault4dbt](https://github.com/ScalefreeCOM/datavault4dbt) | Supply macros for staging and Data Vault transformations executed through dbt. | Apache-2.0. Validate the required macros against the selected database and adapter. |
-| [dbt](https://github.com/dbt-labs/dbt) | Compile, test, and run transformation models. | Select an explicitly licensed open-source runtime/distribution and compatible adapter. Record the exact artifact and version rather than assuming every dbt-branded offering has the same terms. |
 
 **FCT public website and registration form:** use the [official connector access page](https://www.scalefree.com/consulting/turbovault/flowbi-connector/) to request access. Registration is a vendor onboarding step for the connector. Assign a designated owner for credentials and download provenance. Verify whether ongoing connectivity or credentials are needed during operation.
 
@@ -259,3 +260,7 @@ Select the pilot described in this blueprint, name its business and technical ow
 | Receive implementation updates | [Scalefree newsletter registration](https://www.scalefree.com/) | Use the “Data Vault 2.GO / Build Better Data Platforms” newsletter form on the homepage. |
 
 Complete the pilot's reconciliation, access, recovery, and cost checks before extending the source scope. Record the results and the decision to proceed in the project repository.
+
+## License
+
+Copyright © 2026 Scalefree International GmbH. The original text, tables, and diagrams in this blueprint are licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Credit Scalefree, identify changes, and retain the applicable ShareAlike terms when distributing adaptations. See [LICENSE.md](LICENSE.md) for scope, attribution, and the governing legal code. Referenced software and third-party material retain their own licenses.

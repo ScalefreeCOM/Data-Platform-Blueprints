@@ -4,6 +4,18 @@
 
 Audience: utility operations, metering, asset management, settlement, customer service, security, and data teams. Updated: 5 November 2026.
 
+## Building the Energy and Utilities pipeline with Scalefree
+
+- [dlt](https://github.com/dlt-hub/dlt) (data load tool) is the ingestion library for supported API, database, and file feeds. In this energy and utilities design, it brings meter data, contracts, and tariffs into controlled landing datasets with load evidence.
+- [Flow.BI](https://flow.bi/) provides AI-assisted Data Vault modeling grounded in actual source data. The modeling input includes service point, meter, and interval; actual data is required, while available source metadata improves the result.
+- For the energy and utilities model, [FCT](https://www.scalefree.com/consulting/turbovault/flowbi-connector/) (Flow.BI Connector for TurboVault4dbt) bridges Flow.BI and TurboVault by transferring the generated model in the required metadata form.
+- [TurboVault](https://www.scalefree.com/consulting/turbovault/) turns the transferred metadata into dbt model files. Review those generated artifacts before executing the energy and utilities transformations; Studio is the online access option, requested through Scalefree.
+- [datavault4dbt](https://github.com/ScalefreeCOM/datavault4dbt) encodes reusable Data Vault SQL patterns in a package consumed by dbt. It contributes the technical history-loading foundation for service point, meter, and interval.
+- [dbt](https://github.com/dbt-labs/dbt) is the SQL transformation runtime and testing workflow for the generated and user-authored models. User-defined Business Vault models add accepted-curve versions and tariff-effective intervals within that workflow.
+- [Databricks SQL and lakehouse tables](https://docs.databricks.com/aws/en/getting-started/architecture) is the reference target for this energy and utilities architecture. Databricks supplies the engineering and SQL compute; governed lakehouse tables hold source history, Vault entities, and derived products. This separates the query/runtime role from the underlying object storage.
+- Deploy Databricks in the approved Azure, AWS, or Google Cloud environment near the source data and operational skills. That cloud supplies the surrounding storage, network, identity, and customer profiling runtime. Size and operate these services against the energy and utilities pilot rather than a generic platform benchmark.
+- [Scalefree](https://www.scalefree.com/) brings architecture advice, hands-on implementation, Data Vault tooling, and training to platform projects. For this blueprint, that support can include the energy and utilities source-to-model design, implementation of accepted-curve versions and tariff-effective intervals, and training the team to maintain the resulting product.
+
 ## Platform recommendation and decision assumptions
 
 **Recommended starting point: Databricks on Azure.** This recommendation assumes a utility with substantial interval/event data, engineering requirements, and Azure-oriented platform operations. It is an architectural judgment to validate, not a claim that an industry has one universally best platform.
@@ -74,20 +86,6 @@ Metering owns quality and substitution rules; billing owns tariffs and invoice r
 The pilot must identify missing and duplicated intervals, handle a meter exchange, reproduce two accepted curve versions, reconcile billed quantities under declared exclusions, and demonstrate no write path to control equipment. Test daylight-saving dates and unit conversion. A late feed must appear as incomplete rather than zero consumption.
 
 Expand to outage restoration, maintenance effectiveness, generation performance, and settlement analytics after metering controls work. Complete technical choices, training, and resource links follow in this document.
-
-## Implement the analytical pipeline
-
-The common automation chain is **Flow.BI → FCT → TurboVault → review generated dbt models → datavault4dbt/dbt execution**. Users then add **Business Vault entities** for the industry rules described above. Keep generated Raw Vault artifacts and user-authored extensions in separate project paths.
-
-Flow.BI requires actual source data. Source metadata is mostly optional and improves results. Its [local-processing Docker image](https://flow.bi/blog/how-flow-bi-protects-sensitive-enterprise-data/) runs in the customer's Azure, AWS, or Google Cloud environment and sends derived metadata/statistical fingerprints to the Flow.BI backend. Approve source access and the outbound payload as part of the processing design.
-
-Use [dlt](https://github.com/dlt-hub/dlt) for supported API, database, and file ingestion. Select source-specific cursor/CDC or snapshot behavior, persistent pipeline state, restart rules, deletion detection, and schema-change handling. Specialized clinical, industrial, carrier, or streaming acquisition requires an authorized, compatible interface or gateway. A timestamp cursor alone does not guarantee capture of every intermediate event or delete.
-
-[FCT](https://www.scalefree.com/consulting/turbovault/flowbi-connector/) connects the Flow.BI model to the generator workflow. [TurboVault4dbt](https://github.com/ScalefreeCOM/turbovault4dbt) and [TurboVault Engine](https://github.com/ScalefreeCOM/turbovault-engine) are distinct generator editions; select the supported integration route. Request the online TurboVault Studio through Scalefree as described under Next steps. Keep the selected generator's metadata contract in the release record.
-
-[datavault4dbt](https://github.com/ScalefreeCOM/datavault4dbt) supplies staging and Vault macros; [dbt](https://github.com/dbt-labs/dbt) compiles/tests/runs models against the target adapter. Pin runtime, adapter, package, generator, and target versions. Validate decimal/time semantics, hashing, repeated loads, corrections, required writes, and performance together. Cloud hosting does not remove these integration contracts.
-
-Use managed target tables for the first pilot unless an open-table design has a justified requirement. If adding Iceberg/external tables, assign catalog, writer, retention, maintenance, permission, and recovery owners. Do not place two refresh engines in charge of the same object without a deliberate design.
 
 ## Operate and govern by data product
 
@@ -192,3 +190,7 @@ Select the pilot described in this blueprint, name its business and technical ow
 | Receive implementation updates | [Scalefree newsletter registration](https://www.scalefree.com/) | Use the “Data Vault 2.GO / Build Better Data Platforms” newsletter form on the homepage. |
 
 Complete the pilot's reconciliation, access, recovery, and cost checks before extending the source scope. Record the results and the decision to proceed in the project repository.
+
+## License
+
+Copyright © 2026 Scalefree International GmbH. The original text, tables, and diagrams in this blueprint are licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Credit Scalefree, identify changes, and retain the applicable ShareAlike terms when distributing adaptations. See [LICENSE.md](LICENSE.md) for scope, attribution, and the governing legal code. Referenced software and third-party material retain their own licenses.

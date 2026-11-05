@@ -4,6 +4,16 @@
 
 Audience: producers, cooperatives, agronomists, farm operations, sustainability teams, commodity finance, and data stewards. Updated: 5 November 2026.
 
+## How the Agriculture Data Vault stack fits together
+
+[Scalefree](https://www.scalefree.com/) supports platform design and delivery with Data Vault expertise, software tooling, and practical training. For this blueprint, that support can include the agriculture source-to-model design, implementation of moisture normalization and field/parcel histories, and training the team to maintain the resulting product.
+
+[dlt](https://github.com/dlt-hub/dlt) (data load tool) is the ingestion library for supported API, database, and file feeds. In this agriculture design, it brings farm records, field geometry, and harvest into controlled landing datasets with load evidence. [Flow.BI](https://flow.bi/) uses data profiling and AI-assisted modeling to define an integrated Data Vault. The modeling input includes field-season, operation, and harvest; actual data is required, while available source metadata improves the result.
+
+For the agriculture model, [FCT](https://www.scalefree.com/consulting/turbovault/flowbi-connector/) (Flow.BI Connector for TurboVault4dbt) is the connector that maps Flow.BI output into metadata TurboVault can consume. [TurboVault](https://www.scalefree.com/consulting/turbovault/) builds the metadata-driven dbt project artifacts for the target implementation. Review those generated artifacts before executing the agriculture transformations; Studio is the online access option, requested through Scalefree. [datavault4dbt](https://github.com/ScalefreeCOM/datavault4dbt) provides standardized macro definitions for the Vault structures and load behavior. It contributes the technical history-loading foundation for field-season, operation, and harvest.
+
+[dbt](https://github.com/dbt-labs/dbt) executes model SQL through the selected adapter and records the transformation/test run. User-defined Business Vault models add moisture normalization and field/parcel histories within that workflow. [Google BigQuery](https://cloud.google.com/bigquery/pricing) is the reference target for this agriculture architecture. BigQuery is the managed analytical warehouse and SQL execution engine for the typed source data, Vault, and reporting products. Google Cloud provides the project/IAM, storage, network, and execution environment around BigQuery. The customer-managed Flow.BI Docker component runs within that environment. Size and operate these services against the agriculture pilot rather than a generic platform benchmark.
+
 ## Platform recommendation and decision assumptions
 
 **Recommended starting point: Google Cloud with BigQuery.** This recommendation assumes an agriculture/cooperative analytics team needing seasonal SQL and geospatial products, with approved Google Cloud use. It is an architectural judgment to validate, not a claim that an industry has one universally best platform.
@@ -74,20 +84,6 @@ Agronomists approve crop/measurement meaning; producers approve sharing; operati
 Acceptance requires tracing a delivery back to source harvests, reconciling delivered and stored quantities with explicit drying/handling adjustments, reproducing reference-moisture yield, and detecting missing or incompatible units. Test producer access isolation and a withdrawn sharing permission. Weather or sensor gaps must be visible rather than interpolated without a declared rule.
 
 Expand into crop planning, resource efficiency, and risk analytics only after the season and quantity model is reliable. The remainder of this document provides the complete tools, cloud choices, training, and resources.
-
-## Implement the analytical pipeline
-
-The common automation chain is **Flow.BI → FCT → TurboVault → review generated dbt models → datavault4dbt/dbt execution**. Users then add **Business Vault entities** for the industry rules described above. Keep generated Raw Vault artifacts and user-authored extensions in separate project paths.
-
-Flow.BI requires actual source data. Source metadata is mostly optional and improves results. Its [local-processing Docker image](https://flow.bi/blog/how-flow-bi-protects-sensitive-enterprise-data/) runs in the customer's Azure, AWS, or Google Cloud environment and sends derived metadata/statistical fingerprints to the Flow.BI backend. Approve source access and the outbound payload as part of the processing design.
-
-Use [dlt](https://github.com/dlt-hub/dlt) for supported API, database, and file ingestion. Select source-specific cursor/CDC or snapshot behavior, persistent pipeline state, restart rules, deletion detection, and schema-change handling. Specialized clinical, industrial, carrier, or streaming acquisition requires an authorized, compatible interface or gateway. A timestamp cursor alone does not guarantee capture of every intermediate event or delete.
-
-[FCT](https://www.scalefree.com/consulting/turbovault/flowbi-connector/) connects the Flow.BI model to the generator workflow. [TurboVault4dbt](https://github.com/ScalefreeCOM/turbovault4dbt) and [TurboVault Engine](https://github.com/ScalefreeCOM/turbovault-engine) are distinct generator editions; select the supported integration route. Request the online TurboVault Studio through Scalefree as described under Next steps. Keep the selected generator's metadata contract in the release record.
-
-[datavault4dbt](https://github.com/ScalefreeCOM/datavault4dbt) supplies staging and Vault macros; [dbt](https://github.com/dbt-labs/dbt) compiles/tests/runs models against the target adapter. Pin runtime, adapter, package, generator, and target versions. Validate decimal/time semantics, hashing, repeated loads, corrections, required writes, and performance together. Cloud hosting does not remove these integration contracts.
-
-Use managed target tables for the first pilot unless an open-table design has a justified requirement. If adding Iceberg/external tables, assign catalog, writer, retention, maintenance, permission, and recovery owners. Do not place two refresh engines in charge of the same object without a deliberate design.
 
 ## Operate and govern by data product
 
@@ -192,3 +188,7 @@ Select the pilot described in this blueprint, name its business and technical ow
 | Receive implementation updates | [Scalefree newsletter registration](https://www.scalefree.com/) | Use the “Data Vault 2.GO / Build Better Data Platforms” newsletter form on the homepage. |
 
 Complete the pilot's reconciliation, access, recovery, and cost checks before extending the source scope. Record the results and the decision to proceed in the project repository.
+
+## License
+
+Copyright © 2026 Scalefree International GmbH. The original text, tables, and diagrams in this blueprint are licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Credit Scalefree, identify changes, and retain the applicable ShareAlike terms when distributing adaptations. See [LICENSE.md](LICENSE.md) for scope, attribution, and the governing legal code. Referenced software and third-party material retain their own licenses.

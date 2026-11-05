@@ -4,6 +4,16 @@
 
 Audience: SQL analytics teams, Google Cloud engineers, data product owners, governance, and FinOps. Updated: 5 November 2026.
 
+## The components behind Google BigQuery reporting
+
+[Scalefree](https://www.scalefree.com/) provides data and AI consulting, Data Vault implementation, software integration, and training. For this blueprint, that support can include the google bigquery source-to-model design, implementation of business-date logic and reusable analytical measures, and training the team to maintain the resulting product.
+
+[dlt](https://github.com/dlt-hub/dlt) (data load tool) is the ingestion library for supported API, database, and file feeds. In this google bigquery design, it brings supported API/file loads, BigQuery datasets, and analytical consumers into controlled landing datasets with load evidence. [Flow.BI](https://flow.bi/) supplies the data-driven modeling stage that precedes physical model generation. The modeling input includes dataset, typed source table, and query job; actual data is required, while available source metadata improves the result.
+
+For the google bigquery model, [FCT](https://www.scalefree.com/consulting/turbovault/flowbi-connector/) (Flow.BI Connector for TurboVault4dbt) handles the connector handoff from Flow.BI to the downstream model generator. [TurboVault](https://www.scalefree.com/consulting/turbovault/) generates the dbt models from that metadata. Review those generated artifacts before executing the google bigquery transformations; Studio is the online access option, requested through Scalefree. [datavault4dbt](https://github.com/ScalefreeCOM/datavault4dbt) is the dbt macro package that implements standard Data Vault loading patterns. It contributes the technical history-loading foundation for dataset, typed source table, and query job.
+
+[dbt](https://github.com/dbt-labs/dbt) provides the build-and-test workflow that executes the model dependencies on the database. User-defined Business Vault models add business-date logic and reusable analytical measures within that workflow. [Google BigQuery](https://cloud.google.com/bigquery/pricing) is the reference target for this google bigquery architecture. BigQuery is the managed analytical warehouse and SQL execution engine for the typed source data, Vault, and reporting products. Google Cloud provides the project/IAM, storage, network, and execution environment around BigQuery. The customer-managed Flow.BI Docker component runs within that environment. Size and operate these services against the google bigquery pilot rather than a generic platform benchmark.
+
 ## Choose serverless operation for a measurable workload
 
 BigQuery is a starting point for teams seeking managed SQL analytics, especially where sources and skills already sit in Google Cloud. The adoption case is reduced infrastructure operation and flexible analytical scale. It does not eliminate table design, data quality, workload management, or cost accountability.
@@ -132,3 +142,7 @@ Select the pilot described in this blueprint, name its business and technical ow
 | Receive implementation updates | [Scalefree newsletter registration](https://www.scalefree.com/) | Use the “Data Vault 2.GO / Build Better Data Platforms” newsletter form on the homepage. |
 
 Complete the pilot's reconciliation, access, recovery, and cost checks before extending the source scope. Record the results and the decision to proceed in the project repository.
+
+## License
+
+Copyright © 2026 Scalefree International GmbH. The original text, tables, and diagrams in this blueprint are licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Credit Scalefree, identify changes, and retain the applicable ShareAlike terms when distributing adaptations. See [LICENSE.md](LICENSE.md) for scope, attribution, and the governing legal code. Referenced software and third-party material retain their own licenses.

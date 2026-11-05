@@ -4,6 +4,16 @@
 
 Audience: PostgreSQL/Greenplum practitioners, data warehouse architects, infrastructure operators, analytics engineers, and cost owners. Updated: 5 November 2026.
 
+## Building the Apache Cloudberry pipeline with Scalefree
+
+[Scalefree](https://www.scalefree.com/) brings architecture advice, hands-on implementation, Data Vault tooling, and training to platform projects. For this blueprint, that support can include the apache cloudberry source-to-model design, implementation of domain-specific derived entities and reporting views, and training the team to maintain the resulting product.
+
+[dlt](https://github.com/dlt-hub/dlt) (data load tool) is the ingestion library for supported API, database, and file feeds. In this apache cloudberry design, it brings approved source extracts, distributed relations, and SQL consumers into controlled landing datasets with load evidence. [Flow.BI](https://flow.bi/) provides AI-assisted Data Vault modeling grounded in actual source data. The modeling input includes distributed table, business key, and source batch; actual data is required, while available source metadata improves the result.
+
+For the apache cloudberry model, [FCT](https://www.scalefree.com/consulting/turbovault/flowbi-connector/) (Flow.BI Connector for TurboVault4dbt) bridges Flow.BI and TurboVault by transferring the generated model in the required metadata form. [TurboVault](https://www.scalefree.com/consulting/turbovault/) turns the transferred metadata into dbt model files. Review those generated artifacts before executing the apache cloudberry transformations; Studio is the online access option, requested through Scalefree. [datavault4dbt](https://github.com/ScalefreeCOM/datavault4dbt) encodes reusable Data Vault SQL patterns in a package consumed by dbt. It contributes the technical history-loading foundation for distributed table, business key, and source batch.
+
+[dbt](https://github.com/dbt-labs/dbt) is the SQL transformation runtime and testing workflow for the generated and user-authored models. User-defined Business Vault models add domain-specific derived entities and reporting views within that workflow. [Apache Cloudberry](https://cloudberry.apache.org/) is the reference target for this apache cloudberry architecture. Apache Cloudberry is the distributed SQL database based on the Greenplum/PostgreSQL lineage. Its coordinator and segments store and process the warehouse data using an explicitly managed distribution plan. Azure, AWS, or Google Cloud can supply the compute, persistent storage, network, and backup infrastructure. Cloudberry database administration and recovery remain assigned operating responsibilities. Size and operate these services against the apache cloudberry pilot rather than a generic platform benchmark.
+
 ## Understand the foundation
 
 [Apache Cloudberry](https://cloudberry.apache.org/) derives from the open-source Greenplum Database 7 codebase and develops that foundation with a newer PostgreSQL kernel. It uses a massively parallel processing design. A coordinator plans queries; segment processes hold distributed portions of the data and execute work. See the [architecture reference](https://cloudberry.apache.org/docs/next/introduction/cbdb-architecture/).
@@ -131,3 +141,7 @@ Select the pilot described in this blueprint, name its business and technical ow
 | Receive implementation updates | [Scalefree newsletter registration](https://www.scalefree.com/) | Use the “Data Vault 2.GO / Build Better Data Platforms” newsletter form on the homepage. |
 
 Complete the pilot's reconciliation, access, recovery, and cost checks before extending the source scope. Record the results and the decision to proceed in the project repository.
+
+## License
+
+Copyright © 2026 Scalefree International GmbH. The original text, tables, and diagrams in this blueprint are licensed under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). Credit Scalefree, identify changes, and retain the applicable ShareAlike terms when distributing adaptations. See [LICENSE.md](LICENSE.md) for scope, attribution, and the governing legal code. Referenced software and third-party material retain their own licenses.
